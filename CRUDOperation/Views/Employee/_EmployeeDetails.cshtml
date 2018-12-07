@@ -1,0 +1,47 @@
+﻿@model List<CRUDOperation.Models.EmployeeModel>
+<table>
+    <tr>
+        <th>
+           First Name
+        </th>
+        <th>
+           Last Name
+        </th>
+        <th>
+           Salary
+        </th>
+
+        <th>
+            Update
+        </th>
+        <th>
+            Delete
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>
+@item.FirstName
+        </td>
+        <td>
+           @item.LastName
+        </td>
+        <td>
+           @item.Salary
+        </td>
+
+
+        <td>
+            <a href="javascript:void(0)" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="DeleteUserPopUp(@item.EmployeeId)"><div class="label label-table label-success">Delete</div></a>
+        </td>
+        <td>
+            <a href="javascript:void(0)" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="UpdateUserPopUp('@item.EmployeeId','@item.FirstName','@item.LastName','@item.Salary')"><div class="label label-table label-success">Edit</div></a>
+        </td>
+        <td></td>
+
+    </tr>
+    }
+
+</table>

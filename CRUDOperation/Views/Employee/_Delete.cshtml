@@ -1,0 +1,35 @@
+﻿@model CRUDOperation.Models.EmployeeModel
+<div class="modal-dialog modal-lg">
+    <div class="modal-content popup_adj">
+        <div class="modal-header" style="padding-bottom:35px">
+            <h4 class="modal-title" id="myLargeModalLabel">Information</h4>
+
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="CloseModalPopup('divEmployeePopUp')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="card card-body">
+
+                        <div class="row">
+                            <div class="col-sm-12 col-xs-12">
+                                <form>
+
+                                    <button type="button" class="btn btn-success waves-effect waves-light m-r-10" id="btnSubmitPopUp" onclick="DeleteEmployeeType(@Model.EmployeeId)">Delete</button>
+                                    <div id="divMessagePopUp"></div>
+                                  
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- /.modal-content -->
+</div>
+<!-- /.modal-dialog -->

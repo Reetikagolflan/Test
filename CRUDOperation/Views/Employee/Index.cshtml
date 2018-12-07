@@ -1,0 +1,287 @@
+﻿@model CRUDOperation.Models.EmployeeModel
+
+<div class="row page-titles">
+    <div class="col-md-5 align-self-center">
+        <h3 class="text-themecolor">Add Employee</h3>
+
+    </div>
+
+
+</div>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<div class="row">
+    <div class="col-md-7">
+        <div class="card card-body">
+
+            @using (Ajax.BeginForm(new AjaxOptions { OnBegin = "OnSaveEmployeeBegin", OnSuccess = "OnSaveEmployeeSuccess", Url = "http://localhost:50752/Employee/SaveEmployeeDetails" }))
+            {
+                <table>
+
+
+                    <tr>
+                        <td>
+                            FirstName
+                        </td>
+                        <td>
+                            @*  ////data inserted in texbox binds to model*@
+                            @Html.TextBoxFor(model => model.FirstName, new { id = "FName" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            LastName
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.LastName, new { id = "LName" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Salary
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Salary, new { id = "Salary" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+
+                            <button type="submit" class="btn btn-info"> <i class="fa fa-check"></i>  Submit</button>
+                            <div id="divMessage"></div>
+                        </td>
+                    </tr>
+                </table>
+
+
+
+
+
+
+            }
+        </div>
+        <span id="divEmployeeDetailTable"></span>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;" id="divEmployeePopUp"></div>
+
+<script>
+    var _DOMAINDIVID = "";
+    $(document).ready(function () {
+        GetAllEmployeeTypeTable();
+
+    });
+
+    function OnSaveEmployeeBegin() { }
+    function OnSaveEmployeeSuccess(data) {
+        eval(data)
+        switch (data.code) {
+            case 0:
+                $("#divMessage").html(data.Message);
+                GetAllEmployeeTypeTable();
+                ///after successful login redirect to home page
+                //window.location = "http://localhost:51916/Home/Index"
+                break;
+            case -1:
+                $("#divMessage").html("Failed");
+                break;
+        }
+    }
+    function UpdateEmployeeType(value) {
+        var FirstName = $("#txtFNamePopUp").val();
+        var LastName = $("#txtLNamePopUp").val();
+        var Salary = $("#txtSalaryPopUp").val();
+        if (FirstName == "") {
+            SetHtml("divMessagePopUp", "Employee Name Can Not Be Blank");
+            return;
+        }
+        var url = GetDomain(_DOMAINDIVID) + "Employee/UpdateEmployee"
+        var model = {
+            //left side field name will be same as in ViewModel
+            "EmployeeId": value,
+            "FirstName": FirstName,
+            "LastName": LastName,
+            "Salary": Salary,
+            
+        };
+       
+        $.ajax({
+            method: "POST",
+            url: url,
+            data: JSON.stringify(model),
+            contentType: "application/json",
+            success: function (data) {
+               data = eval(data);
+
+                switch (data.Code) {
+                    case 0:
+                        SetHtml("divMessagePopUp", "Employee Updated Successfully");
+                        GetAllEmployeeTypeTable();
+                        break;
+                    case -1:
+                        SetHtml("divMessagePopUp", data.Message);
+                        Enablebutton("btnSubmitPopUp");
+                        break;
+                    case -2:
+                        SetHtml("divMessagePopUp", "SomeThing Goes Wrong");
+                        Enablebutton("btnSubmitPopUp");
+                        break;
+                }
+            },
+            error: function () {
+                $('#divMessagePopUp').html('<p>An Error Has Occurred</p>');
+            }
+        });
+    }
+    
+    function DeleteEmployeeType(value) {
+
+        var url = GetDomain(_DOMAINDIVID) + "Employee/Delete?id=" + value;
+        
+
+        $.ajax({
+            method: "POST",
+            url: url,
+            success: function (data) {
+                
+
+                data = eval(data);
+
+                switch (data.Code) {
+                    case 0:
+                        SetHtml("divMessagePopUp", "Employee Deleted Successfully");
+                        GetAllEmployeeTypeTable();
+                        break;
+                    case -1:
+                        SetHtml("divMessagePopUp", data.Message);
+                        Enablebutton("btnSubmitPopUp");
+                        break;
+                    case -2:
+                        SetHtml("divMessagePopUp", "SomeThing Goes Wrong");
+                        Enablebutton("btnSubmitPopUp");
+                        break;
+                }
+            },
+            error: function () {
+                $('#divMessagePopUp').html('<p>An Error Has Occurred</p>');
+            }
+        });
+        
+    }
+
+    function DeleteUserPopUp(value) {
+        {
+            var url = GetDomain(_DOMAINDIVID) + "Employee/DeletePopUp?id=" + value;
+
+            $.ajax({
+                method: "POST",
+                url: url,
+                success: function (data) {
+
+                    data = eval(data);
+
+                    switch (data.code) {
+                        case 0:
+                            SetHtml("divEmployeePopUp", data.message);
+                            break;
+                        case -1:
+                            SetHtml("divEmployeePopUp", data.message);
+
+                            break;
+                        case -2:
+                            SetHtml("divEmployeePopUp", "SomeThing Goes Wrong");
+                            break;
+                    }
+                },
+                error: function () {
+                    $('#divEmployeePopUp').html('<p>An Error Has Occurred</p>');
+                }
+            });
+        }}
+    function UpdateUserPopUp(id,FName,LName,Salary) {
+
+        var url = GetDomain(_DOMAINDIVID) + "Employee/UpdatePopUp"
+        var model = {
+        
+           
+            "EmployeeId": id,
+                "FirstName": FName,
+                "LastName": LName,
+                "Salary": Salary,
+                            
+        };
+
+        $.ajax({
+            method: "POST",
+            url: url,
+            data: JSON.stringify(model),
+            contentType: "application/json",
+            success: function (data) {
+
+                data = eval(data);
+                
+                switch (data.code) {
+                    case 0:
+                        SetHtml("divEmployeePopUp", data.message);
+                        break;
+                    case -1:
+                        SetHtml("divEmployeePopUp", data.message);
+
+                        break;
+                    case -2:
+                        SetHtml("divEmployeePopUp", "SomeThing Goes Wrong");
+                        break;
+                }
+            },
+            error: function () {
+                $('#divEmployeePopUp').html('<p>An Error Has Occurred</p>');
+            }
+        });}
+    function GetAllEmployeeTypeTable() {
+        var url = GetDomain(_DOMAINDIVID) + "Employee/GetAllEmployee";
+        SetHtml("divEmployeeDetailTable", "Please Wait..");
+        $.ajax({
+            method: "POST",
+            url: url,
+            success: function (data) {
+
+                data = eval(data);
+
+              
+                switch (data.Code) {
+                    case 0:
+                        SetHtml("divEmployeeDetailTable", data.Message);
+                        break;
+                    case -1:
+                        SetHtml("divEmployeeDetailTable", data.Message);
+                        Enablebutton("btnSubmit");
+                        break;
+                    case -2:
+                        SetHtml("divEmployeeDetailTable", "SomeThing Goes Wrong");
+                        Enablebutton("btnSubmit");
+                        break;
+                }
+            },
+            error: function () {
+                $('#divEmployeeDetailTable').html('<p>An Error Has Occurred</p>');
+            }
+        });
+
+    }
+    function GetDomain(vsal) {
+        return "http://localhost:50752/";
+    }
+    function SetHtml(divId,content) {
+
+        $("#" + divId).html(content);
+    }
+
+    function Enablebutton(btnId) {
+        $("#" + btnId).prop("disabled", false);
+
+    }
+
+</script>
+
+
